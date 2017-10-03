@@ -1,79 +1,85 @@
 class FSM {
-    /**
-     * Creates new FSM instance.
-     * @param config
-     */
     constructor(config) {
         this.config = config;
+
         if (!this.config) {
             throw err
         }
+        this.state = this.config.initial;
+        this.stateArr = ['normal'];
+        this.index = 0;
 
     }
-
-    /**
-     * Returns active state.
-     * @returns {String}
-     */
     getState() {
-        return this.config.initial;
-
+        // console.log(this.state);
+        return this.state;
     }
-
-    /**
-     * Goes to specified state.
-     * @param state
-     */
     changeState(state) {
         if (state === 'hungry') {
-            this.config.initial = 'hungry'
+            this.state = 'hungry'
         } else {
             if (state === 'busy') {
-                this.config.initial = 'busy'
+                this.state = 'busy'
             } else {
                 if (state === 'sleeping') {
-                    this.config.initial = 'sleeping'
+                    this.state = 'sleeping'
                 } else {
                     if (state === 'normal') {
-                        this.config.initial = 'normal'
+                        this.state = 'normal'
                     } else throw err
                 }
 
             }
         }
+        this.index++;
+         this.stateArr[this.index] = this.state;
     }
-
-
-    /**
-     * Changes state according to event transition rules.
-     * @param event
-     */
     trigger(event) {
-        if(this.config.initial === 'hungry'){ this.config.initial = 'normal'}
-        if(this.config.initial === 'normal'){if(event==='study'){this.config.initial =this.config.states.normal.transitions.study}}
-        if(this.config.initial ==='busy'){ if(event ==='get_tired'){this.config.initial = this.config.states.busy.transitions.get_tired}else{if(event ==='get_hungry'){this.config.initial = this.config.states.busy.transitions.get_hungry}else{
-            if(event ==='hmmm... exception?'){throw err}else{if(event==='eat'){throw err}else {if (event==='get_up'){throw err}}}}}}
-        if(this.config.initial ==='hungry'){if(event ==='eat'){this.config.initial = this.config.states.hungry.transition.eat}}
-        if(this.config.initial ==='sleeping'){if(event ==='get_hungry'){this.config.initial = this.config.states.sleeping.transitions.get_hungry}}
+        if (this.state === 'normal') {
+            if (event === 'study') {
+                this.state = this.config.states.normal.transitions.study;
+                // console.log(this.state);
+            }
+        }
+        if (this.state === 'busy') {
+            if (event === 'get_tired') {
+                this.state = this.config.states.busy.transitions.get_tired
+            } else {
+                if (event === 'get_hungry') {
+                    this.state = this.config.states.busy.transitions.get_hungry;
 
+                } else {
+                    if (event === 'hmmm... exception?') {
+                        throw err
+                    } else {
+                        if (event === 'eat') {
+                            throw err
+                        } else {
+                            if (event === 'get_up') {
+                                throw err
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (this.state=== 'hungry') {
+            if (event === 'eat') {
+                this.state = this.config.states.hungry.transitions.eat;
+                console.log(this.state);
+            }
+        }
+        if (this.state === 'sleeping') {
+            if (event === 'get_hungry') {
+                this.state = this.config.states.sleeping.transitions.get_hungry
+            }
+        }
+        this.index++;
+        this.stateArr[this.index] = this.state;
     }
-
-
-
-
-    /**
-     * Resets FSM state to initial.
-     */
     reset() {
-        return this.config.initial = 'normal'
+        return this.state = 'normal'
     }
-
-    /**
-     * Returns an array of states for which there are specified event transition rules.
-     * Returns all states if argument is undefined.
-     * @param event
-     * @returns {Array}
-     */
     getStates(event) {
         if (!event) {
             return ['normal', 'busy', 'hungry', 'sleeping']
@@ -86,50 +92,22 @@ class FSM {
         }
         if (event = 'hmmm... empty array?') {
             return [];
-
-
         }
     }
-
-    /**
-     * Goes back to previous state.
-     * Returns false if undo is not available.
-     * @returns {Boolean}
-     */
     undo() {
-        if (this.config.initial) {
-            return false
-        }
-
-        if(this.config.initial ==='busy'){this.config.initial = 'normal'}else{if(this.config.initial ==='hungry'){this.config.initial = 'busy'}}
-        if(this.config.initial ==='hungry')(this.config.initial = 'normal');
-
-        if (this.config.initial==='busy') {
-            return true
-        }
-        }
-
-
-
-
-    /**
-     * Goes redo to state.
-     * Returns false if redo is not available.
-     * @returns {Boolean}
-     */
-    redo() {
-        if (this.config.initial) {
-            return false
-        }
+        this.index--;
+        this.state = this.stateArr[this.index];
+        return !!this.state
     }
+    redo() {
 
-    /**
-     * Clears transition history
-     */
+        this.index++;
+        this.state = this.stateArr[this.index];
+        return !!this.state
+    }
     clearHistory() {
+        this.stateArr.splice(0,this.stateArr.length);
     }
 }
-
 module.exports = FSM;
 
-/** @Created by Uladzimir Halushka **/
